@@ -5,8 +5,6 @@ import {
   EyeOff,
   HelpCircle,
   KeyRound,
-  Lock,
-  ShieldCheck,
   UserCheck,
 } from 'lucide-react';
 import { UserProfile } from '../types/agenda';
@@ -142,21 +140,17 @@ export const LoginView: React.FC<LoginViewProps> = ({
               </div>
             </div>
 
-            <div className="space-y-2.5 pt-2 text-xs text-slate-200 leading-relaxed">
-              <div className="flex items-start gap-2.5">
-                <ShieldCheck className="w-4 h-4 text-sky-300 shrink-0 mt-0.5" />
-                <span>
-                  Kendali akses berjenjang (RBAC) untuk Super Admin, Admin
-                  Sistem, Operator Umpeg, Pimpinan, Kabid/Kasubag, dan Pegawai.
-                </span>
-              </div>
-              <div className="flex items-start gap-2.5">
-                <Lock className="w-4 h-4 text-sky-300 shrink-0 mt-0.5" />
-                <span>
-                  Terintegrasi ekstraksi surat masuk e-Buddy, deteksi bentrok
-                  jam WIB, dan pencatatan Audit Log otomatis.
-                </span>
-              </div>
+            <div className="pt-2 text-xs text-slate-200 leading-relaxed">
+              <p>
+                SIAGA BPBD Sidoarjo adalah aplikasi web dan asisten cerdas
+                berbasis AI yang dirancang untuk mendigitalisasi alur
+                pengelolaan agenda kegiatan kedinasan di lingkungan Badan
+                Penanggulangan Bencana Daerah (BPBD) Kabupaten Sidoarjo. Sistem
+                ini menyelesaikan kendala pemrosesan surat masuk
+                undangan/disposisi dari aplikasi e-Buddy yang selama ini
+                dilakukan secara manual oleh ASN Pengadministrasi Umum sebelum
+                disebarkan ke pimpinan dan grup WhatsApp pegawai.
+              </p>
             </div>
           </div>
 
