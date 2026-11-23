@@ -19,6 +19,7 @@ import {
   UserProfile,
 } from '../types/agenda';
 import {
+  buildWhatsAppShareUrl,
   formatRentangWIB,
   formatTanggalIndonesia,
   previewDraftConflicts,
@@ -29,6 +30,7 @@ import {
   safeExternalUrl,
 } from '../utils/rbac';
 import { StatusIndicator } from './StatusIndicator';
+import { WhatsAppIcon } from './WhatsAppIcon';
 
 interface AgendaDetailModalProps {
   currentUser: UserProfile;
@@ -94,22 +96,22 @@ export const AgendaDetailModal: React.FC<AgendaDetailModalProps> = ({
     ? previewDraftConflicts(draft, allItems)
     : [];
 
-  const handleCopySingle = async () => {
-    const text = [
-      `*INFO AGENDA BPBD KAB. SIDOARJO*`,
-      `Hari/Tanggal: ${formatTanggalIndonesia(item.tanggal)}`,
-      `Pukul: ${formatRentangWIB(item.jamMulai, item.jamSelesai)}`,
-      `Kegiatan: ${item.namaKegiatan}`,
-      `Lokasi: ${item.lokasi}${safeUrl ? ` (${safeUrl})` : ''}`,
-      `PIC / Peserta: ${item.pic}`,
-      `Status: ${item.status}`,
-      item.catatanDisposisi ? `Disposisi: ${item.catatanDisposisi}` : '',
-    ]
-      .filter(Boolean)
-      .join('\n');
+  const singleAgendaText = [
+    `*INFO AGENDA BPBD KAB. SIDOARJO*`,
+    `Hari/Tanggal: ${formatTanggalIndonesia(item.tanggal)}`,
+    `Pukul: ${formatRentangWIB(item.jamMulai, item.jamSelesai)}`,
+    `Kegiatan: ${item.namaKegiatan}`,
+    `Lokasi: ${item.lokasi}${safeUrl ? ` (${safeUrl})` : ''}`,
+    `PIC / Peserta: ${item.pic}`,
+    `Status: ${item.status}`,
+    item.catatanDisposisi ? `Disposisi: ${item.catatanDisposisi}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
 
+  const handleCopySingle = async () => {
     try {
-      await navigator.clipboard.writeText(text);
+      await navigator.clipboard.writeText(singleAgendaText);
       setCopiedSingle(true);
       setTimeout(() => setCopiedSingle(false), 1800);
     } catch {
@@ -286,6 +288,16 @@ export const AgendaDetailModal: React.FC<AgendaDetailModalProps> = ({
                     </>
                   )}
                 </button>
+
+                <a
+                  href={buildWhatsAppShareUrl(singleAgendaText)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#16A34A] hover:bg-[#15803D] rounded-lg transition-colors whitespace-nowrap"
+                >
+                  <WhatsAppIcon className="w-3.5 h-3.5" />
+                  <span>Share ke WhatsApp</span>
+                </a>
 
                 {canEdit && (
                   <button

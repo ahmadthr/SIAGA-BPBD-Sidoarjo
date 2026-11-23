@@ -19,6 +19,7 @@ const SECTION_TITLES: Record<ActiveNavSection, string> = {
   dashboard: 'Dashboard Agenda',
   'input-ebuddy': 'Input Surat / e-Buddy',
   'kalender-linimasa': 'Kalender & Linimasa WIB',
+  'rekap-harian': 'Rekap Agenda Per Hari',
   'rekap-wa': 'Rekap & Broadcast WhatsApp',
   'master-data': 'Master Unit & Lokasi Sidoarjo',
   'super-admin': 'Super Admin · Akun & Audit Log',
@@ -84,7 +85,10 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         </div>
 
-        {caps.canCreateAgenda ? (
+        {caps.canCreateAgenda &&
+        activeSection !== 'rekap-wa' &&
+        activeSection !== 'input-ebuddy' &&
+        activeSection !== 'rekap-harian' ? (
           <button
             type="button"
             onClick={onQuickAdd}

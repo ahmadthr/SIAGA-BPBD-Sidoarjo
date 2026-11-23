@@ -98,6 +98,7 @@ export type ActiveNavSection =
   | 'dashboard'
   | 'input-ebuddy'
   | 'kalender-linimasa'
+  | 'rekap-harian'
   | 'rekap-wa'
   | 'master-data'
   | 'super-admin';

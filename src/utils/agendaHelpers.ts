@@ -588,6 +588,11 @@ export function generateStaffGroupWA(
   return lines.join('\n');
 }
 
+export function buildWhatsAppShareUrl(message: string): string {
+  const cleanText = (message || '').trim().slice(0, 3800);
+  return `https://wa.me/?text=${encodeURIComponent(cleanText)}`;
+}
+
 export function downloadAgendaCsv(items: AgendaItem[], tanggal: string) {
   const sorted = sortAgendasChronological(
     items.filter((x) => x.tanggal === tanggal)

@@ -3,6 +3,7 @@ import {
   Building2,
   CalendarClock,
   FileInput,
+  FileSpreadsheet,
   LayoutDashboard,
   LogOut,
   MessageSquareShare,
@@ -61,10 +62,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
       visible: true,
     },
     {
+      id: 'rekap-harian',
+      label: 'Rekap Agenda Per Hari',
+      icon: FileSpreadsheet,
+      visible: true,
+    },
+    {
       id: 'rekap-wa',
       label: caps.canBroadcastWA
         ? 'Rekap & Broadcast WA'
-        : 'Kartu Agenda Harian',
+        : 'Poster Agenda WA',
       icon: MessageSquareShare,
       visible: true,
     },

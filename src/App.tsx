@@ -7,6 +7,7 @@ import {
   CreateAgendaModal,
 } from './components/CreateAgendaModal';
 import { DashboardView } from './components/DashboardView';
+import { DailyReportView } from './components/DailyReportView';
 import { InputEBuddyView } from './components/InputEBuddyView';
 import { LoginView } from './components/LoginView';
 import { MasterDataView } from './components/MasterDataView';
@@ -469,6 +470,17 @@ export default function App() {
                 openCreateAgendaModal({ tanggal: selectedDate, jamMulai: hour })
               }
               canCreateAgenda={caps.canCreateAgenda}
+            />
+          )}
+
+          {activeSection === 'rekap-harian' && (
+            <DailyReportView
+              agendas={agendas}
+              selectedDate={selectedDate}
+              onChangeDate={setSelectedDate}
+              conflictsMap={conflictsMap}
+              units={units}
+              onInspectItem={(item) => setInspectingItemId(item.id)}
             />
           )}
 

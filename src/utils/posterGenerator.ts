@@ -741,3 +741,52 @@ export async function copyPosterImageToClipboard(
     }, 'image/png');
   });
 }
+
+export type SharePosterResult =
+  | 'shared'
+  | 'aborted'
+  | 'fallback_clipboard'
+  | 'fallback_download';
+
+function canvasToPngBlob(canvas: HTMLCanvasElement): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), 'image/png');
+  });
+}
+
+export async function sharePosterToWhatsApp(
+  canvas: HTMLCanvasElement,
+  selectedDate: string
+): Promise<SharePosterResult> {
+  const fileName = `agenda-bpbd-sidoarjo-${selectedDate}.png`;
+  const blob = await canvasToPngBlob(canvas);
+
+  if (blob && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    const file = new File([blob], fileName, { type: 'image/png' });
+    const canShareFiles =
+      typeof navigator.canShare === 'function' &&
+      navigator.canShare({ files: [file] });
+
+    if (canShareFiles) {
+      try {
+        await navigator.share({
+          files: [file],
+        });
+        return 'shared';
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') {
+          return 'aborted';
+        }
+        // Fallback below if blocked by iframe permissions or browser policy
+      }
+    }
+  }
+
+  const copied = await copyPosterImageToClipboard(canvas);
+  if (copied) {
+    return 'fallback_clipboard';
+  }
+
+  downloadPosterImage(canvas, selectedDate, 'png');
+  return 'fallback_download';
+}
