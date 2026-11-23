@@ -136,7 +136,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                 Sistem Informasi Agenda Kegiatan & Disposisi Real-Time
               </p>
               <div className="mt-3 text-xs font-semibold tracking-wide text-amber-300">
-                Siap · Cepat · Tepat · Humanis
+                Siap • Cepat • Tepat • Humanis
               </div>
             </div>
 
@@ -392,7 +392,7 @@ export const LoginView: React.FC<LoginViewProps> = ({
                   className="inline-flex items-center gap-1 text-sky-700 hover:underline font-medium"
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
-                  <span>Lupa Kata Sandi?</span>
+                  <span>Lupa Kata Sandi / Hubungi Admin Sekretariat</span>
                 </button>
               </div>
 

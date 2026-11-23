@@ -84,6 +84,7 @@ export interface AuditLogEntry {
     | 'SUPER_ADMIN_CLAIMED'
     | 'USER_CREATED'
     | 'USER_UPDATED'
+    | 'PASSWORD_CHANGED'
     | 'ROLE_CHANGED'
     | 'AGENDA_CREATED'
     | 'AGENDA_UPDATED'

@@ -149,6 +149,14 @@ function persistStore() {
   fs.writeFileSync(STORE_PATH, JSON.stringify(store, null, 2), 'utf8');
 }
 
+function getClientIp(req: Request): string {
+  const fwd = req.headers['x-forwarded-for'];
+  if (typeof fwd === 'string' && fwd.trim()) {
+    return fwd.split(',')[0].trim().slice(0, 64);
+  }
+  return (req.ip || req.socket?.remoteAddress || 'unknown').slice(0, 64);
+}
+
 function addAuditLog(entry: Omit<AuditLogEntry, 'id' | 'timestampWIB'>) {
   store.auditLogs.unshift({
     ...entry,
@@ -400,6 +408,8 @@ async function startServer() {
       persistStore();
     }
 
+    const clientIp = getClientIp(req);
+
     if (!user) {
       addAuditLog({
         actorNip: identifier.trim().slice(0, 32),
@@ -407,7 +417,7 @@ async function startServer() {
         actorRole: 'PEGAWAI_VIEWER',
         event: 'LOGIN_FAILED',
         target: identifier.trim().slice(0, 32),
-        detail: 'Percobaan login dengan NIP/Username tidak terdaftar.',
+        detail: `Percobaan login dengan NIP/Username tidak terdaftar (IP: ${clientIp}).`,
       });
       res.status(401).json({
         error: 'NIP / Username atau Kata Sandi tidak sesuai.',
@@ -449,7 +459,7 @@ async function startServer() {
           actorRole: user.roleCode,
           event: 'ACCOUNT_LOCKED',
           target: user.nip,
-          detail: 'Akun dikunci 15 menit setelah 5 kali kegagalan kata sandi.',
+          detail: `Akun dikunci 15 menit setelah 5 kali kegagalan kata sandi (IP: ${clientIp}).`,
         });
         persistStore();
         res.status(423).json({
@@ -465,7 +475,7 @@ async function startServer() {
         actorRole: user.roleCode,
         event: 'LOGIN_FAILED',
         target: user.nip,
-        detail: `Kata sandi tidak sesuai (percobaan ke-${user.failedAttempts}).`,
+        detail: `Kata sandi tidak sesuai (percobaan ke-${user.failedAttempts}, IP: ${clientIp}).`,
       });
       persistStore();
       res.status(401).json({
@@ -487,7 +497,7 @@ async function startServer() {
       actorRole: user.roleCode,
       event: 'LOGIN_SUCCESS',
       target: user.nip,
-      detail: `Login berhasil sebagai ${user.roleCode} (${user.unitKerja}).`,
+      detail: `Login berhasil sebagai ${user.roleCode} (${user.unitKerja}, IP: ${clientIp}).`,
     });
 
     const token = issueToken(user, Boolean(rememberSession));
@@ -521,6 +531,59 @@ async function startServer() {
     requireAuth,
     (req: AuthenticatedRequest, res: Response) => {
       res.json({ user: sanitizeUser(req.authUser!) });
+    }
+  );
+
+  app.post(
+    '/api/auth/change-password',
+    requireAuth,
+    (req: AuthenticatedRequest, res: Response) => {
+      const { currentPassword, newPassword } = req.body || {};
+      if (
+        typeof currentPassword !== 'string' ||
+        typeof newPassword !== 'string' ||
+        !currentPassword ||
+        newPassword.length < 6
+      ) {
+        res.status(400).json({
+          error:
+            'Kata sandi saat ini wajib diisi dan kata sandi baru minimal 6 karakter.',
+        });
+        return;
+      }
+
+      const actor = req.authUser!;
+      const envPass = getEnvSuperAdminPasscode();
+      const envMatchesSuperAdmin =
+        actor.roleCode === 'SUPER_ADMIN' &&
+        Boolean(envPass) &&
+        safeCompareStrings(currentPassword, envPass);
+
+      if (
+        !envMatchesSuperAdmin &&
+        !verifyPassword(currentPassword, actor.passwordHash)
+      ) {
+        res.status(401).json({
+          error: 'Kata sandi saat ini tidak sesuai.',
+        });
+        return;
+      }
+
+      actor.passwordHash = hashPassword(newPassword);
+      actor.failedAttempts = 0;
+      actor.lockUntil = null;
+      persistStore();
+
+      addAuditLog({
+        actorNip: actor.nip,
+        actorName: actor.namaLengkap,
+        actorRole: actor.roleCode,
+        event: 'PASSWORD_CHANGED',
+        target: actor.nip,
+        detail: `Pengguna ${actor.namaLengkap} memperbarui kata sandi akun secara mandiri.`,
+      });
+
+      res.json({ ok: true });
     }
   );
 
